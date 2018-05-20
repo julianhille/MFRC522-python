@@ -7,6 +7,7 @@ import RPi.GPIO as GPIO
 import spi
 import signal
 import time
+import threading
   
 class MFRC522:
   NRSTPD = 25
@@ -106,18 +107,39 @@ class MFRC522:
   Reserved32      = 0x3D
   Reserved33      = 0x3E
   Reserved34      = 0x3F
-    
+  
   serNum = []
+  
+  irq = threading.Event()
   
   def __init__(self, dev='/dev/spidev0.0', spd=1000000):
     spi.openSPI(device=dev,speed=spd)
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(25, GPIO.OUT)
     GPIO.output(self.NRSTPD, 1)
+    GPIO.setup(24, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.add_event_detect(24, GPIO.FALLING, callback=self.IRQ_Callback)
     self.MFRC522_Init()
   
   def MFRC522_Reset(self):
     self.Write_MFRC522(self.CommandReg, self.PCD_RESETPHASE)
+  
+  def IRQ_Callback(self, pin):
+    self.irq.set()
+  
+  def Wait_For_Tag(self):
+    self.MFRC522_Init()
+    self.irq.clear()
+    self.Write_MFRC522(self.CommIrqReg, 0x00)
+    self.Write_MFRC522(self.CommIEnReg, 0xA0)
+    waiting = True
+    while waiting:
+      self.Write_MFRC522(self.FIFODataReg, 0x26)
+      self.Write_MFRC522(self.CommandReg, 0x0C)
+      self.Write_MFRC522(self.BitFramingReg, 0x87)
+      waiting = not self.irq.wait(0.1)
+    self.irq.clear()
+    self.MFRC522_Init()
   
   def Write_MFRC522(self, addr, val):
     spi.transfer(((addr<<1)&0x7E,val))
@@ -129,7 +151,7 @@ class MFRC522:
   def SetBitMask(self, reg, mask):
     tmp = self.Read_MFRC522(reg)
     self.Write_MFRC522(reg, tmp | mask)
-    
+  
   def ClearBitMask(self, reg, mask):
     tmp = self.Read_MFRC522(reg);
     self.Write_MFRC522(reg, tmp & (~mask))

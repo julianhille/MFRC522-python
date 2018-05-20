@@ -13,16 +13,21 @@ class SimpleMFRC522:
   def __init__(self):
     self.READER = MFRC522.MFRC522()
   
+  def wait(self):
+    self.READER.Wait_For_Tag()
+  
   def read(self):
-      id, text = self.read_no_block()        
-      while not id:
-          id, text = self.read_no_block()  
-      return id, text
+    self.wait()
+    id, text = self.read_no_block()
+    #while not id:
+    #    id, text = self.read_no_block()
+    return id, text
 
   def read_id(self):
-    id, text = self.read_no_block()        
-    while not id:
-      id, text = self.read_no_block()  
+    self.wait()
+    id, text = self.read_no_block()
+    #while not id:
+    #  id, text = self.read_no_block()
     return id
 
   def read_id_no_block(self):
@@ -54,10 +59,11 @@ class SimpleMFRC522:
 
     
   def write(self, text):
-      id, text_in = self.write_no_block(text)        
-      while not id:
-          id, text_in = self.write_no_block(text)  
-      return id, text_in
+    self.wait()
+    id, text_in = self.write_no_block(text)
+    #while not id:
+    #  id, text_in = self.write_no_block(text)
+    return id, text_in
 
 
   def write_no_block(self, text):
