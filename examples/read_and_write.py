@@ -4,8 +4,7 @@ import signal
 import sys
 
 from time import sleep
-from MFRC522 import mfrc522
-from MFRC522.mfrc522 import format_hex
+from mfrc522 import MFRC522, PICC_Type, PICC_Command, MIFARE_Key, StatusCode, format_hex
 
 
 logging.basicConfig(level=logging.INFO)
@@ -26,7 +25,7 @@ def setup(rfid, key):
     rfid.pcd_init()                     # Init MFRC522
     rfid.pcd_dump_version_to_serial()   # Show details of PCD - MFRC522 Card Reader details
     print('Scan a MIFARE Classic PICC to demonstrate read and write.')
-    print('Using key (for A and B): {}'.format(mfrc522.format_hex(key.key_byte)))
+    print('Using key (for A and B): {}'.format(format_hex(key.key_byte)))
     print()
     print('BEWARE: Data will be written to the PICC, in sector #1')
 
@@ -47,9 +46,9 @@ def loop(rfid, key):
     
     # Check for compatibility
     picc_type = uid.get_picc_type()
-    if (picc_type != mfrc522.PICC_Type.PICC_TYPE_MIFARE_MINI
-            and picc_type != mfrc522.PICC_Type.PICC_TYPE_MIFARE_1K
-            and picc_type != picc_type != mfrc522.PICC_Type.PICC_TYPE_MIFARE_4K):
+    if (picc_type != PICC_Type.PICC_TYPE_MIFARE_MINI
+            and picc_type != PICC_Type.PICC_TYPE_MIFARE_1K
+            and picc_type != picc_type != PICC_Type.PICC_TYPE_MIFARE_4K):
         print('This sample only works with MIFARE Classic cards.')
         return
     
@@ -64,13 +63,11 @@ def loop(rfid, key):
         0x0c, 0x0d, 0x0e, 0x0f   # 12, 13,  14, 15
         ]
     trailer_block   = 7
-    buffer = [0] * 18
-    size = 18
 
     # Authenticate using key A
     print('Authenticating using key A...')
-    status = rfid.pcd_authenticate(mfrc522.PICC_Command.PICC_CMD_MF_AUTH_KEY_A, trailer_block, key, uid)
-    if status != mfrc522.StatusCode.STATUS_OK:
+    status = rfid.pcd_authenticate(PICC_Command.PICC_CMD_MF_AUTH_KEY_A, trailer_block, key, uid)
+    if status != StatusCode.STATUS_OK:
         print('PCD_Authenticate() failed: {}'.format(status))
         return
 
@@ -82,16 +79,16 @@ def loop(rfid, key):
     # Read data from the block
     print('Reading data from block {:#04x} ...'.format(block_addr))
     status, data = rfid.mifare_read(block_addr)
-    if status != mfrc522.StatusCode.STATUS_OK:
+    if status != StatusCode.STATUS_OK:
         print('MIFARE_Read() failed: {}'.format(status))
 
-    print('Data in block {}: [{}]'.format(block_addr, mfrc522.format_hex(data[:16])))
+    print('Data in block {}: [{}]'.format(block_addr, format_hex(data[:16])))
     print()
 
     # Authenticate using key B
     print('Authenticating again using key B...')
-    status = rfid.pcd_authenticate(mfrc522.PICC_Command.PICC_CMD_MF_AUTH_KEY_B, trailer_block, key, uid)
-    if status != mfrc522.StatusCode.STATUS_OK:
+    status = rfid.pcd_authenticate(PICC_Command.PICC_CMD_MF_AUTH_KEY_B, trailer_block, key, uid)
+    if status != StatusCode.STATUS_OK:
         print('PCD_Authenticate() failed: {}'.format(status))
         return
 
@@ -99,17 +96,17 @@ def loop(rfid, key):
     print('Writing data into block {:#04x} ...'.format(block_addr))
     print('Data: [{}]'.format(format_hex(data_block)))
     status = rfid.mifare_write(block_addr, data_block)
-    if status != mfrc522.StatusCode.STATUS_OK:
+    if status != StatusCode.STATUS_OK:
         print('MIFARE_Write() failed: {}'.format(status))
     print()
 
     # Read data from the block (again, should now be what we have written)
     print('Reading data from block {:#04x} ...'.format(block_addr))
     status, data = rfid.mifare_read(block_addr)
-    if status != mfrc522.StatusCode.STATUS_OK:
+    if status != StatusCode.STATUS_OK:
         print('MIFARE_Read() failed: {}'.format(status))
 
-    print('Data in block {}: [{}]'.format(block_addr, mfrc522.format_hex(data[:16])))
+    print('Data in block {}: [{}]'.format(block_addr, format_hex(data[:16])))
     print()
 
     # Check that data in block is what we have written
@@ -139,11 +136,11 @@ def loop(rfid, key):
     rfid.pcd_stop_crypto1()
 
 
-rfid = mfrc522.MFRC522()
+rfid = MFRC522()
 
 # Prepare the key (used both as key A and as key B)
 # using FFFFFFFFFFFFh which is the default at chip delivery from the factory
-key = mfrc522.MIFARE_Key()
+key = MIFARE_Key()
 
 try:
     setup(rfid, key)

@@ -3,7 +3,7 @@ import logging
 import signal
 import sys
 
-from MFRC522 import mfrc522
+from mfrc522 import MFRC522
 
 
 logging.basicConfig(level=logging.INFO)
@@ -33,7 +33,7 @@ def setup(rfid):
     print('Result: {}'.format('OK' if result else 'DEFECT or UNKNOWN'))
 
 
-rfid = mfrc522.MFRC522()
+rfid = MFRC522()
 try:
     setup(rfid)
 

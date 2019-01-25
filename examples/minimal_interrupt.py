@@ -2,10 +2,9 @@
 import logging
 import signal
 import sys
-import threading
 
 from time import sleep
-from MFRC522 import mfrc522
+from mfrc522 import MFRC522, PCD_Register, PCD_Command, PICC_Command
 import RPi.GPIO as GPIO
 
 
@@ -35,15 +34,15 @@ def activate_rec(rfid):
     '''
     The function sending to the MFRC522 the needed commands to activate the reception
     '''
-    rfid.pcd_write_register(mfrc522.PCD_Register.FIFODataReg, mfrc522.PICC_Command.PICC_CMD_REQA.value)
-    rfid.pcd_write_register(mfrc522.PCD_Register.CommandReg, mfrc522.PCD_Command.PCD_Transceive.value)
-    rfid.pcd_write_register(mfrc522.PCD_Register.BitFramingReg, 0x87)
+    rfid.pcd_write_register(PCD_Register.FIFODataReg, PICC_Command.PICC_CMD_REQA.value)
+    rfid.pcd_write_register(PCD_Register.CommandReg, PCD_Command.PCD_Transceive.value)
+    rfid.pcd_write_register(PCD_Register.BitFramingReg, 0x87)
 
 def clear_int(rfid):
     '''
     The function to clear the pending interrupt bits after interrupt serving routine
     '''
-    rfid.pcd_write_register(mfrc522.PCD_Register.ComIrqReg, 0x7F)
+    rfid.pcd_write_register(PCD_Register.ComIrqReg, 0x7F)
 
 def setup(rfid):
     rfid.pcd_init()                     # Init MFRC522
@@ -54,7 +53,7 @@ def setup(rfid):
     # Allow the ... irq to be propagated to the IRQ pin
     # For test purposes propagate the IdleIrq and loAlert
     reg_val = 0xA0 # rx irq
-    rfid.pcd_write_register(mfrc522.PCD_Register.ComIEnReg, reg_val)
+    rfid.pcd_write_register(PCD_Register.ComIEnReg, reg_val)
     
     # Activate the interrupt
     GPIO.add_event_detect(rfid.pin_irq, GPIO.FALLING, callback=read_card)
@@ -80,7 +79,7 @@ def loop(rfid):
     # (mfrc522.PCD_WriteRegister(mfrc522.FIFODataReg,mfrc522.PICC_CMD_REQA);)
     activate_rec(rfid)
 
-rfid = mfrc522.MFRC522()
+rfid = MFRC522()
 try:
     setup(rfid)
     while run:

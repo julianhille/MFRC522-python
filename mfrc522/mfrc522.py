@@ -118,12 +118,14 @@ MIFARE Ultralight C (MF0ICU2):
 '''
 
 import logging
-import traceback
 from time import sleep
 
 import RPi.GPIO as GPIO
 from enum import Enum
 import spidev
+
+from .utils import format_hex
+from .utils import FormatString as _F
 
 
 
@@ -2180,36 +2182,6 @@ class MFRC522(object):
 #====================================================================================
 # Helper functions for the python version of MFRC522
 #====================================================================================
-
-class _F(object):
-    '''
-    Helper class to create log messages with string format()
-    https://stackoverflow.com/questions/13131400/logging-variable-data-with-new-format-string/13131690#13131690
-    
-    Example:
-    >>> logger.debug(_F('Message with {0} {name}', 2, name='placeholders'))
-    '''
-    def __init__(self, fmt, *args, **kwargs):
-        self.fmt = fmt
-        self.args = args
-        self.kwargs = kwargs
-
-    def __str__(self):
-        try:
-            message = self.fmt.format(*self.args, **self.kwargs)
-        except:
-            message = 'ERROR creating log message! ' + "\n" + traceback.format_exc()
-        return message
-
-def format_hex(data):
-    '''
-    Helper function to create a readable string for a list of bytes
-    '''
-    try:
-        result = ' '.join(format(x, '#04x') for x in data)
-    except:
-        result = 'ERROR: {} is not a HEX list'.format(data)
-    return result
 
 # Helper function to suspend executen for x microsecends
 usleep = lambda x: sleep(x/1000000.0)

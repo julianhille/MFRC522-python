@@ -4,7 +4,7 @@ import signal
 import sys
 
 from time import sleep
-from MFRC522 import mfrc522
+from mfrc522 import MFRC522
 
 
 logging.basicConfig(level=logging.INFO)
@@ -43,7 +43,7 @@ def loop(rfid):
     rfid.picc_dump_to_serial(uid)
     print()
 
-rfid = mfrc522.MFRC522()
+rfid = MFRC522()
 try:
     setup(rfid)
     while run:

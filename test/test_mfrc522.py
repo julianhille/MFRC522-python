@@ -16,7 +16,7 @@ sys.modules['RPi.GPIO'] = mock.MagicMock()
 sys.modules['spidev'] = mock.MagicMock()
 
 # After mocking libraries import the system under test (sut)
-from MFRC522 import mfrc522
+from mfrc522 import MFRC522
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -33,7 +33,7 @@ class TestMFRC522(unittest.TestCase):
 
     def test__spi_transfer(self):
         # arrange
-        sut = mfrc522.MFRC522()
+        sut = MFRC522()
         sut.spi.xfer2 = mock.MagicMock(return_value=[125,6,6,0])
         data = [1,2,3]
         
