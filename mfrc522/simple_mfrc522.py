@@ -166,7 +166,7 @@ class SimpleMFRC522(object):
         
         status, uid, data = self.read_bytes(terminal_byte=terminal_byte)
         
-        if not status:
+        if not status or status == StatusCode.STATUS_CANCELED:
             return status, uid, None
         
         byte_data = bytearray(data)
@@ -267,7 +267,7 @@ class SimpleMFRC522(object):
         data = list(bytearray(text, encoding=encoding))
         status, uid, old_data = self.write_bytes(data, terminal_byte=terminal_byte)
         
-        if not status:
+        if not status or status == StatusCode.STATUS_CANCELED:
             return status, uid, None
         
         old_byte_data = bytearray(old_data)
