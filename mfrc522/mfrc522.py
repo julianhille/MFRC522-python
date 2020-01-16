@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Library to interface with the NFC reader Module MFRC522 on the Raspberry Pi. 
 This is a Python port of the "Arduino RFID Library for MFRC522" published by

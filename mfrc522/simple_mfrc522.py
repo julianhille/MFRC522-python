@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Simpler interface compared to mfrc522.py to the NFC reader Module MFRC522 on the Raspberry Pi.
 Inspired by https://github.com/pimylifeup/MFRC522-python

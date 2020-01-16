@@ -8,6 +8,7 @@ setup(name='MFRC522-python',
     install_requires=['spidev', 'RPi.GPIO'],
     packages=['mfrc522'],
     classifiers=[
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Operating System :: POSIX :: Linux",
