@@ -166,7 +166,7 @@ class SimpleMFRC522(object):
         
         status, uid, data = self.read_bytes(terminal_byte=terminal_byte)
         
-        if not status:
+        if status != StatusCode.STATUS_OK:
             return status, uid, None
         
         byte_data = bytearray(data)
@@ -190,7 +190,7 @@ class SimpleMFRC522(object):
                 return StatusCode.STATUS_CANCELED, None, None
             
             status, uid = self.rfid.picc_read_card_serial()
-            if not status:
+            if status != StatusCode.STATUS_OK::
                 logger_debug.warn(_F('Failed to read UID in read_bytes (status: {}, uid: {})', status, uid))
                 continue
             
@@ -210,7 +210,7 @@ class SimpleMFRC522(object):
         # Stop encryption on PCD
         self.rfid.pcd_stop_crypto1()
         
-        if not status:
+        if status != StatusCode.STATUS_OK::
             return status, uid, None
         
         return status, uid, data
@@ -231,7 +231,7 @@ class SimpleMFRC522(object):
             
             # Authenticate using key A
             status = self.rfid.pcd_authenticate(PICC_Command.PICC_CMD_MF_AUTH_KEY_A, trailer_block, key, uid)
-            if not status:
+            if status != StatusCode.STATUS_OK::
                 logger_debug.error(_F('Authentication failed (block_addr: {:#04x}, uid: [{}])', trailer_block, format_hex(uid.uid())))
                 return status, None
             
@@ -267,7 +267,7 @@ class SimpleMFRC522(object):
         data = list(bytearray(text, encoding=encoding))
         status, uid, old_data = self.write_bytes(data, terminal_byte=terminal_byte)
         
-        if not status:
+        if status != StatusCode.STATUS_OK::
             return status, uid, None
         
         old_byte_data = bytearray(old_data)
@@ -294,7 +294,7 @@ class SimpleMFRC522(object):
                 return StatusCode.STATUS_CANCELED, None, None
             
             status, uid = self.rfid.picc_read_card_serial()
-            if not status:
+            if status != StatusCode.STATUS_OK::
                 logger_debug.warn(_F('Failed to read UID in write_bytes (status: {}, uid: {})', status, uid))
                 continue
             
@@ -311,7 +311,7 @@ class SimpleMFRC522(object):
         status, old_data = self._read_mifare_classic(uid, terminal_byte=terminal_byte)
         
         # Write new data to PICC
-        if status:
+        if status == StatusCode.STATUS_OK::
             status = self._write_mifare_classic(uid, data)
         
         # Halt PICC
@@ -340,7 +340,7 @@ class SimpleMFRC522(object):
             
             # Authenticate using key B
             status = self.rfid.pcd_authenticate(PICC_Command.PICC_CMD_MF_AUTH_KEY_B, trailer_block, key, uid)
-            if not status:
+            if status != StatusCode.STATUS_OK:
                 logger_debug.error(_F('Authentication failed (block_addr: {:#04x}, uid: [{}])', trailer_block, format_hex(uid.uid())))
                 return status, None
             
